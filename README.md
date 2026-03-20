@@ -1,76 +1,118 @@
 # WhatsApp Group Exporter
 
-Aplicação web para autenticar no WhatsApp Web via QR Code, selecionar grupos e fazer o backup dos contatos/participantes em JSON.
-
-## Objetivo
-Permitir que o usuário, pelo navegador, faça:
-- autenticação segura via QR Code do WhatsApp
-- visualização de todos os seus grupos
-- seleção dos grupos desejados
-- download do arquivo JSON com os contatos deduplicados
-
-## Fluxo do usuário
-1. Usuário acessa a aplicação no navegador
-2. Clica em **"Conectar WhatsApp"**
-3. QR Code é exibido em tempo real (via WebSocket)
-4. Usuário escaneia com o celular → autenticação confirmada
-5. Lista de grupos é exibida com checkboxes
-6. Usuário seleciona os grupos desejados
-7. Clica em **"Exportar Contatos"**
-8. Arquivo JSON é gerado e baixado automaticamente
-
-## Escopo da V1
-- autenticação via QR Code na interface web
-- exibição do QR em tempo real via WebSocket
-- listagem dos grupos com seleção por checkbox
-- exportação dos contatos selecionados para JSON
-- deduplicação de contatos entre grupos
-- logs básicos no servidor
-
-## Fora do escopo
-- envio de mensagens
-- automação comercial
-- banco de dados
-- sincronização contínua
-- suporte a múltiplas contas simultâneas
+Aplicacao web para autenticar no WhatsApp Web via QR Code, listar grupos e exportar contatos deduplicados em JSON.
 
 ## Stack
 - Node.js + TypeScript
-- Fastify (servidor HTTP)
-- Baileys (integração WhatsApp Web)
-- WebSocket (`ws`) — streaming do QR Code
-- Zod (validação de dados)
-- HTML + CSS + JavaScript (frontend)
+- Fastify
+- Baileys
+- WebSocket (`@fastify/websocket`)
+- Zod
+- Frontend estatico (`public/`)
 
-## Estrutura de pastas
-```
+## Pre-requisitos
+- Node.js 20+ (recomendado: Node 24)
+- Yarn 4+
+- Conta WhatsApp ativa para autenticar via QR
+
+## Estrutura do projeto
+```text
 src/
-  server/       → inicialização do servidor HTTP
-  routes/       → rotas REST da API
-  ws/           → handler WebSocket para QR Code
-  session/      → autenticação e persistência Baileys
-  services/     → grupos, contatos, deduplicação
-  types/        → tipos Zod/TypeScript
+  server/
+  routes/
+  ws/
+  session/
+  services/
+  types/
   utils/
   index.ts
 
-public/         → frontend servido estaticamente
+public/
   index.html
   app.js
   style.css
+
+docs/
+  architecture.md
+  product.md
+  decisions.md
+  backlog.md
 ```
 
-## Endpoints da API
-| Método | Rota | Responsabilidade |
-|---|---|---|
-| `POST` | `/session/start` | inicia sessão Baileys, começa QR stream |
-| `WS` | `/session/qr` | emite QR em tempo real até autenticar |
-| `GET` | `/session/status` | retorna se está conectado |
-| `GET` | `/groups` | lista todos os grupos |
-| `POST` | `/export` | recebe JIDs selecionados, devolve JSON |
+## Como levantar o ambiente de desenvolvimento
+1. Instale as dependencias:
+```bash
+yarn install
+```
 
-## Documentação
-- [Decisões Técnicas](docs/decisions.md)
+2. Rode em modo desenvolvimento:
+```bash
+yarn dev
+```
+
+3. Abra no navegador:
+```text
+http://localhost:3000
+```
+
+## Scripts
+- `yarn dev`: sobe servidor com reload (`tsx watch`)
+- `yarn build`: compila TypeScript para `dist/`
+- `yarn start`: executa build compilada
+- `yarn lint`: valida codigo com ESLint
+- `yarn format`: formata com Prettier
+
+## Fluxo de uso da aplicacao
+1. Clique em `Conectar WhatsApp`
+2. Escaneie o QR Code com o celular
+3. Aguarde status `conectado`
+4. Selecione os grupos
+5. Clique em `Exportar Contatos`
+6. Baixe o arquivo `contacts-export.json`
+
+## Endpoints principais
+- `POST /session/start`: inicia sessao Baileys
+- `WS /session/qr`: stream do QR em tempo real
+- `GET /session/status`: status da sessao
+- `GET /groups`: lista grupos
+- `POST /export`: exporta contatos dos grupos selecionados
+
+## Persistencia de sessao
+- Credenciais do WhatsApp ficam em `auth_info_baileys/`
+- Essa pasta permite reconectar sem novo QR (quando sessao ainda valida)
+
+## Ferramentas Codex/MCP
+Este ambiente pode usar MCP no Codex para automacao de navegador.
+
+### Playwright MCP
+Configuracao usada:
+- nome: `playwright`
+- comando: `npx -y @playwright/mcp`
+
+Comandos uteis:
+```bash
+codex mcp list
+codex mcp get playwright
+```
+
+Se precisar adicionar manualmente:
+```bash
+codex mcp add playwright -- npx -y @playwright/mcp
+```
+
+## Solucao de problemas
+### Erro de dependencia do Baileys no Yarn PnP (`long`)
+O projeto ja inclui ajuste para isso em:
+- `package.json` (dependencia `long`)
+- `.yarnrc.yml` (`packageExtensions` para `baileys`)
+
+Se ocorrer novamente:
+```bash
+yarn install
+```
+
+## Documentacao complementar
 - [Arquitetura](docs/architecture.md)
-- [Backlog](docs/backlog.md)
 - [Produto](docs/product.md)
+- [Decisoes Tecnicas](docs/decisions.md)
+- [Backlog](docs/backlog.md)
