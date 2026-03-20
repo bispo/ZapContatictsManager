@@ -1,4 +1,5 @@
 const connectBtn = document.getElementById('connect-btn');
+const disconnectBtn = document.getElementById('disconnect-btn');
 const sessionStatus = document.getElementById('session-status');
 const qrWrapper = document.getElementById('qr-wrapper');
 const qrImage = document.getElementById('qr-image');
@@ -54,6 +55,24 @@ const renderGroups = () => {
     row.append(checkbox, label);
     groupsList.appendChild(row);
   }
+};
+
+const resetToDisconnected = () => {
+  if (ws) {
+    ws.close();
+    ws = null;
+  }
+  qrImage.src = '';
+  qrWrapper.classList.add('hidden');
+  groups = [];
+  selectedGroups.clear();
+  renderGroups();
+  groupsCard.classList.add('hidden');
+  exportCard.classList.add('hidden');
+  setText(exportStatus, '');
+  connectBtn.disabled = false;
+  disconnectBtn.disabled = false;
+  setText(sessionStatus, 'Status: desconectado');
 };
 
 const fetchGroups = async () => {
@@ -184,6 +203,25 @@ const exportContacts = async () => {
   }
 };
 
+const disconnectSession = async () => {
+  connectBtn.disabled = true;
+  disconnectBtn.disabled = true;
+  setText(sessionStatus, 'Status: desconectando...');
+
+  try {
+    const response = await fetch('/session/logout', { method: 'POST' });
+    if (!response.ok) {
+      throw new Error('Falha ao desvincular sessao.');
+    }
+    resetToDisconnected();
+  } catch (error) {
+    setText(sessionStatus, `Status: ${error.message}`, true);
+    connectBtn.disabled = false;
+    disconnectBtn.disabled = false;
+    return;
+  }
+};
+
 selectAllBtn.addEventListener('click', () => {
   selectedGroups = new Set(groups.map((group) => group.id));
   renderGroups();
@@ -196,3 +234,4 @@ clearSelectionBtn.addEventListener('click', () => {
 
 connectBtn.addEventListener('click', startSession);
 exportBtn.addEventListener('click', exportContacts);
+disconnectBtn.addEventListener('click', disconnectSession);

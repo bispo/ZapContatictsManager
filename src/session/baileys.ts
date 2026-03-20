@@ -1,3 +1,4 @@
+import { rm } from 'node:fs/promises';
 import {
   DisconnectReason,
   fetchLatestBaileysVersion,
@@ -118,4 +119,28 @@ export const startSession = async (): Promise<{ state: string }> => {
 
   await startInternal();
   return { state: getConnectionState() };
+};
+
+export const logoutSession = async (): Promise<void> => {
+  if (sock) {
+    try {
+      await sock.logout();
+    } catch {
+      // ignorar erros do logout — segue com a limpeza local
+    }
+    sock = null;
+  }
+
+  isInitializing = false;
+  setConnectionState('disconnected');
+  setCurrentQr(null);
+  setSessionStarting(false);
+
+  try {
+    await rm('auth_info_baileys', { recursive: true, force: true });
+  } catch {
+    // ignorar se a pasta nao existir
+  }
+
+  logger.info('Sessao desvinculada. Credenciais removidas.');
 };

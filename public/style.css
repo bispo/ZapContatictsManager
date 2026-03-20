@@ -83,6 +83,22 @@ button.primary:hover {
   border-color: var(--brand-dark);
 }
 
+button.danger {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #fff;
+}
+
+button.danger:hover {
+  filter: brightness(0.88);
+}
+
+.session-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .actions {
   display: flex;
   gap: 10px;
