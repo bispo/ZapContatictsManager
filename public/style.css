@@ -1,0 +1,148 @@
+:root {
+  --bg: #f3f6f8;
+  --card: #ffffff;
+  --text: #13202a;
+  --muted: #5f7384;
+  --line: #d4dde3;
+  --brand: #0f8a5f;
+  --brand-dark: #0a6847;
+  --danger: #a22f2f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top right, #e5f7ef, var(--bg) 40%);
+}
+
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+header {
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+header p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: #b4c3ce;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+button.primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+button.primary:hover {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.groups-list {
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.group-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ebf0f4;
+}
+
+.group-item:last-child {
+  border-bottom: 0;
+}
+
+.group-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.group-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+#qr-wrapper {
+  margin-top: 14px;
+}
+
+#qr-image {
+  width: 280px;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px;
+}
+
+.muted {
+  color: var(--muted);
+  margin: 10px 0 0;
+}
+
+.error {
+  color: var(--danger);
+}
+
+.hidden {
+  display: none;
+}

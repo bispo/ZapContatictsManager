@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp Group Exporter</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>WhatsApp Group Exporter</h1>
+        <p>Conecte sua conta, selecione grupos e exporte os contatos deduplicados em JSON.</p>
+      </header>
+
+      <section id="session-card" class="card">
+        <h2>1. Conexao</h2>
+        <button id="connect-btn" class="primary">Conectar WhatsApp</button>
+        <p id="session-status" class="muted">Status: desconectado</p>
+        <div id="qr-wrapper" class="hidden">
+          <p>Escaneie o QR Code com o WhatsApp no celular:</p>
+          <img id="qr-image" alt="QR Code do WhatsApp" />
+        </div>
+      </section>
+
+      <section id="groups-card" class="card hidden">
+        <h2>2. Selecao de grupos</h2>
+        <div class="actions">
+          <button id="select-all-btn" type="button">Selecionar todos</button>
+          <button id="clear-selection-btn" type="button">Limpar selecao</button>
+        </div>
+        <div id="groups-list" class="groups-list"></div>
+      </section>
+
+      <section id="export-card" class="card hidden">
+        <h2>3. Exportacao</h2>
+        <button id="export-btn" class="primary">Exportar Contatos</button>
+        <p id="export-status" class="muted"></p>
+      </section>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
