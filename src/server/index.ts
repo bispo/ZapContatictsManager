@@ -5,10 +5,10 @@ import fastifyWebsocket from '@fastify/websocket';
 import { registerRoutes } from '../routes/index.js';
 import { registerQrWsHandler } from '../ws/qr.handler.js';
 
-export const buildServer = () => {
+export const buildServer = async () => {
   const app = fastify({ logger: true });
 
-  app.register(fastifyWebsocket);
+  await app.register(fastifyWebsocket);
 
   app.register(fastifyStatic, {
     root: path.resolve(process.cwd(), 'public'),

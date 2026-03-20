@@ -3,14 +3,24 @@ import QRCode from 'qrcode';
 import { onConnected, onQr } from '../session/baileys.js';
 import { getConnectionState, getCurrentQr } from '../session/state.js';
 
-const sendJson = (socket: { send: (data: string) => void }, payload: unknown): void => {
+type WsClient = {
+  readyState: number;
+  send: (data: string) => void;
+  close: () => void;
+  on: (event: 'close', listener: () => void) => void;
+};
+
+const isSocketOpen = (socket: WsClient): boolean => socket.readyState === 1;
+
+const sendJson = (socket: WsClient, payload: unknown): void => {
+  if (!isSocketOpen(socket)) {
+    return;
+  }
+
   socket.send(JSON.stringify(payload));
 };
 
-const sendQrPayload = async (
-  socket: { send: (data: string) => void },
-  qrText: string
-): Promise<void> => {
+const sendQrPayload = async (socket: WsClient, qrText: string): Promise<void> => {
   const dataUrl = await QRCode.toDataURL(qrText, {
     errorCorrectionLevel: 'M',
     margin: 1,
@@ -21,9 +31,7 @@ const sendQrPayload = async (
 };
 
 export const registerQrWsHandler = (app: FastifyInstance): void => {
-  app.get('/session/qr', { websocket: true }, (connection) => {
-    const ws = connection;
-
+  app.get('/session/qr', { websocket: true }, (ws) => {
     if (getConnectionState() === 'connected') {
       sendJson(ws, { type: 'connected' });
       ws.close();
@@ -33,13 +41,17 @@ export const registerQrWsHandler = (app: FastifyInstance): void => {
     const currentQr = getCurrentQr();
 
     if (currentQr) {
-      void sendQrPayload(ws, currentQr);
+      void sendQrPayload(ws, currentQr).catch((error: unknown) => {
+        app.log.warn({ error }, 'Falha ao enviar QR atual via WebSocket');
+      });
     } else {
       sendJson(ws, { type: 'waiting' });
     }
 
     const disposeQr = onQr((qr) => {
-      void sendQrPayload(ws, qr);
+      void sendQrPayload(ws, qr).catch((error: unknown) => {
+        app.log.warn({ error }, 'Falha ao enviar QR atualizado via WebSocket');
+      });
     });
 
     const disposeConnected = onConnected(() => {
