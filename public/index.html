@@ -10,7 +10,7 @@
     <main class="container">
       <header>
         <h1>WhatsApp Group Exporter</h1>
-        <p>Conecte sua conta, selecione grupos e exporte os contatos deduplicados em JSON.</p>
+        <p>Conecte sua conta, exporte grupos, valide contatos e envie campanhas com template e variacoes aleatorias.</p>
       </header>
 
       <section id="session-card" class="card">
@@ -39,6 +39,138 @@
         <h2>3. Exportacao</h2>
         <button id="export-btn" class="primary">Exportar Contatos</button>
         <p id="export-status" class="muted"></p>
+      </section>
+
+      <section id="import-card" class="card hidden">
+        <h2>4. Importacao para transmissao</h2>
+        <p class="muted">
+          Envie um CSV com cabecalho <code>Number,Name</code>. O sistema normaliza, deduplica e
+          opcionalmente verifica quais numeros existem no WhatsApp.
+        </p>
+
+        <div class="import-controls">
+          <input id="csv-file-input" type="file" accept=".csv,text/csv" />
+          <button id="import-btn" class="primary" type="button">Importar CSV</button>
+          <button id="verify-btn" type="button" disabled>Verificar no WhatsApp</button>
+        </div>
+
+        <p id="import-status" class="muted"></p>
+
+        <div id="import-summary" class="summary-grid hidden">
+          <article class="summary-item">
+            <span>Total</span>
+            <strong id="summary-total">0</strong>
+          </article>
+          <article class="summary-item">
+            <span>Validas</span>
+            <strong id="summary-valid">0</strong>
+          </article>
+          <article class="summary-item">
+            <span>Invalidas</span>
+            <strong id="summary-invalid">0</strong>
+          </article>
+          <article class="summary-item">
+            <span>Duplicadas</span>
+            <strong id="summary-duplicate">0</strong>
+          </article>
+        </div>
+
+        <div id="verification-summary" class="verification-box hidden"></div>
+
+        <div class="table-wrapper hidden" id="import-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Linha</th>
+                <th>Nome</th>
+                <th>Numero original</th>
+                <th>Numero normalizado</th>
+                <th>Status importacao</th>
+                <th>Status WhatsApp</th>
+                <th>Detalhe</th>
+              </tr>
+            </thead>
+            <tbody id="import-results-body"></tbody>
+          </table>
+        </div>
+
+        <div id="download-actions" class="actions hidden">
+          <button id="download-json-btn" type="button">Baixar JSON dos validos</button>
+          <button id="download-csv-btn" type="button">Baixar CSV dos validos</button>
+        </div>
+      </section>
+
+      <section id="message-card" class="card hidden">
+        <h2>5. Enviar mensagem</h2>
+        <p class="muted">
+          Use um template com variaveis no formato <code>$nome_da_variavel</code> e um CSV de
+          variaveis com cabecalho <code>Variable,Values</code>, usando <code>|</code> para separar
+          os valores possiveis.
+        </p>
+
+        <div class="campaign-form">
+          <label class="field">
+            <span>Arquivo de contatos validos</span>
+            <input id="campaign-contacts-input" type="file" accept=".csv,text/csv" />
+          </label>
+
+          <label class="field">
+            <span>Arquivo de variaveis</span>
+            <input id="campaign-variables-input" type="file" accept=".csv,text/csv" />
+          </label>
+
+          <label class="field">
+            <span>Template da mensagem</span>
+            <textarea
+              id="message-template-input"
+              rows="8"
+              placeholder="$saudacao, $nome_contato!&#10;&#10;Passando para falar sobre $oferta.&#10;&#10;$cta."
+            ></textarea>
+          </label>
+
+          <div class="actions">
+            <button id="preview-message-btn" class="primary" type="button">Gerar previa</button>
+            <button id="send-message-btn" type="button" disabled>Enviar campanha</button>
+            <button id="download-report-btn" type="button" disabled>Baixar relatorio</button>
+          </div>
+        </div>
+
+        <p id="message-status" class="muted"></p>
+
+        <div id="campaign-preview-box" class="hidden">
+          <div id="campaign-summary" class="summary-grid hidden">
+            <article class="summary-item">
+              <span>Destinatarios</span>
+              <strong id="campaign-total-contacts">0</strong>
+            </article>
+            <article class="summary-item">
+              <span>Variaveis CSV</span>
+              <strong id="campaign-total-variables">0</strong>
+            </article>
+            <article class="summary-item">
+              <span>Variaveis no template</span>
+              <strong id="campaign-template-vars">0</strong>
+            </article>
+            <article class="summary-item">
+              <span>Amostras</span>
+              <strong id="campaign-sample-count">0</strong>
+            </article>
+          </div>
+
+          <div class="preview-grid">
+            <div class="preview-panel">
+              <h3>Variaveis detectadas</h3>
+              <div id="detected-variables" class="tag-list"></div>
+            </div>
+
+            <div class="preview-panel">
+              <h3>Amostras renderizadas</h3>
+              <div id="sample-messages" class="sample-list"></div>
+            </div>
+          </div>
+
+          <div id="campaign-result-summary" class="verification-box hidden"></div>
+        </div>
       </section>
     </main>
 

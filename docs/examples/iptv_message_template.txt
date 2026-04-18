@@ -1,0 +1,14 @@
+$saudacao!
+
+$abertura
+
+Temos 3 planos de IPTV:
+- Smart TV por R$ 25,00/mes
+- TV Android por R$ 30,00/mes
+- TV Box por R$ 35,00/mes
+
+Segundo ponto para qualquer plano por apenas R$ 19,99.
+
+$beneficio
+
+$cta

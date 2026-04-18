@@ -14,6 +14,17 @@ Navegador
   ├── GET /groups           → lista grupos do WhatsApp
   └── POST /export          → recebe JIDs selecionados
                              retorna JSON para download
+  ├── POST /import/contacts → recebe CSV em texto
+  │                          valida, normaliza e deduplica
+  └── POST /transmission/prepare
+                             verifica números no WhatsApp
+                             retorna artefato para uso manual
+  ├── POST /transmission/export-valid
+  │                          exporta apenas contatos validados
+  ├── POST /messages/preview
+  │                          valida template + CSV de variáveis
+  │                          retorna amostras renderizadas
+  └── POST /messages/send   → renderiza e envia campanha individual
 ```
 
 ## Camadas
@@ -33,6 +44,9 @@ Navegador
 - `session.routes.ts` → `POST /session/start`, `GET /session/status`
 - `groups.routes.ts` → `GET /groups`
 - `export.routes.ts` → `POST /export`
+- `import.routes.ts` → `POST /import/contacts`
+- `transmission.routes.ts` → `POST /transmission/prepare`
+- `messages.routes.ts` → `POST /messages/preview`, `POST /messages/send`
 
 ### Sessão (`src/session/`)
 - Inicializa e gerencia instância única do Baileys
@@ -42,6 +56,10 @@ Navegador
 ### Serviços (`src/services/`)
 - `groups.service.ts` → busca chats, filtra grupos, retorna metadados
 - `contacts.service.ts` → obtém participantes, normaliza e deduplica contatos
+- `import-contacts.service.ts` → parseia CSV, valida cabeçalho e classifica linhas
+- `transmission.service.ts` → verifica números no WhatsApp e gera saída manual
+- `message-campaign.service.ts` → valida contatos/variáveis, renderiza template e executa envios
+- `csv.service.ts` → parsing e utilidades CSV compartilhadas
 
 ### Frontend (`public/`)
 - `index.html` → estrutura da página única (SPA simples)
@@ -57,6 +75,9 @@ src/
     session.routes.ts
     groups.routes.ts
     export.routes.ts
+    import.routes.ts
+    transmission.routes.ts
+    messages.routes.ts
   ws/
     qr.handler.ts   → streaming do QR Code via WebSocket
   session/
@@ -65,9 +86,14 @@ src/
   services/
     groups.service.ts
     contacts.service.ts
+    import-contacts.service.ts
+    transmission.service.ts
+    message-campaign.service.ts
+    csv.service.ts
   types/
     group.types.ts
     contact.types.ts
+    import.types.ts
   utils/
     logger.ts
   index.ts          → ponto de entrada, inicia servidor
@@ -83,3 +109,6 @@ public/
 - QR Code transmitido via WebSocket para evitar polling
 - Frontend sem framework para manter zero dependências de build no cliente
 - Export retorna JSON via resposta HTTP com header `Content-Disposition: attachment`
+- Importação de transmissão usa JSON com conteúdo CSV para evitar dependência extra de multipart na V1
+- Criação automática de lista de transmissão ainda não é prometida; a saída atual prepara contatos para uso manual
+- Campanhas de mensagem usam template textual com variáveis randômicas resolvidas por destinatário

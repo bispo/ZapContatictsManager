@@ -59,3 +59,29 @@ A aplicação serve um usuário por vez. Singleton evita múltiplas conexões ao
 ### Consequências
 - não suporta múltiplos usuários simultâneos (fora do escopo da V1)
 - sessão persistida em disco (`auth_info_baileys/`) e reaproveitada entre reinicializações
+
+---
+
+## D006 - Importação para transmissão com fallback manual
+Escolhido entregar a funcionalidade de transmissão em duas partes: importação + validação + verificação no WhatsApp, com saída pronta para uso manual, sem criação automática de lista de transmissão.
+
+### Motivo
+O projeto atual não possui uma prova local de que a combinação Baileys + sessão autenticada cria listas de transmissão de forma estável. A verificação de número é útil e de baixo risco; a automação da lista ainda exige spike separada.
+
+### Consequências
+- a interface passa a aceitar CSV `Number,Name`
+- o backend normaliza, deduplica e classifica linhas antes de qualquer envio
+- a etapa final gera JSON/CSV para montagem manual da transmissão enquanto a automação real não for validada
+
+---
+
+## D007 - Campanha por template com variáveis randômicas
+Escolhido tratar o envio como campanha baseada em template com variáveis no formato `$nome_da_variavel`, resolvidas a partir de um CSV `Variable,Values`.
+
+### Motivo
+O usuário precisa variar o texto entre destinatários sem criar manualmente múltiplas mensagens. Um CSV separado mantém o template simples e o conjunto de variações editável.
+
+### Consequências
+- cada envio renderiza a mensagem final imediatamente antes do disparo
+- o sistema precisa validar template e CSV de variáveis em conjunto
+- o relatório final precisa registrar os valores resolvidos e a mensagem enviada por destinatário
